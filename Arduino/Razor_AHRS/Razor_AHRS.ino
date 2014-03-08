@@ -161,7 +161,7 @@
 //#define HW__VERSION_CODE 10736 // SparkFun "9DOF Razor IMU" version "SEN-10736" (HMC5883L magnetometer)
 //#define HW__VERSION_CODE 10183 // SparkFun "9DOF Sensor Stick" version "SEN-10183" (HMC5843 magnetometer)
 //#define HW__VERSION_CODE 10321 // SparkFun "9DOF Sensor Stick" version "SEN-10321" (HMC5843 magnetometer)
-//#define HW__VERSION_CODE 10724 // SparkFun "9DOF Sensor Stick" version "SEN-10724" (HMC5883L magnetometer)
+#define HW__VERSION_CODE 10724 // SparkFun "9DOF Sensor Stick" version "SEN-10724" (HMC5883L magnetometer)
 
 
 // OUTPUT OPTIONS
@@ -213,21 +213,22 @@ boolean output_errors = false;  // true or false
 // Put MIN/MAX and OFFSET readings for your board here!
 // Accelerometer
 // "accel x,y,z (min/max) = X_MIN/X_MAX  Y_MIN/Y_MAX  Z_MIN/Z_MAX"
-#define ACCEL_X_MIN ((float) -250)
-#define ACCEL_X_MAX ((float) 250)
-#define ACCEL_Y_MIN ((float) -250)
-#define ACCEL_Y_MAX ((float) 250)
+#define ACCEL_X_MIN ((float) -328)
+#define ACCEL_X_MAX ((float) 248)
+#define ACCEL_Y_MIN ((float) -457)
+#define ACCEL_Y_MAX ((float) 190)
 #define ACCEL_Z_MIN ((float) -250)
 #define ACCEL_Z_MAX ((float) 250)
 
 // Magnetometer (standard calibration mode)
 // "magn x,y,z (min/max) = X_MIN/X_MAX  Y_MIN/Y_MAX  Z_MIN/Z_MAX"
-#define MAGN_X_MIN ((float) -600)
-#define MAGN_X_MAX ((float) 600)
-#define MAGN_Y_MIN ((float) -600)
-#define MAGN_Y_MAX ((float) 600)
-#define MAGN_Z_MIN ((float) -600)
-#define MAGN_Z_MAX ((float) 600)
+//magn x,y,z (min/max) = -446.00/592.00  -450.00/603.00  -507.00/531.00
+#define MAGN_X_MIN ((float) -446.00)
+#define MAGN_X_MAX ((float) 592.00)
+#define MAGN_Y_MIN ((float) -450.00)
+#define MAGN_Y_MAX ((float) 603.00)
+#define MAGN_Z_MIN ((float) -507.00)
+#define MAGN_Z_MAX ((float) 531.00)
 
 // Magnetometer (extended calibration mode)
 // Uncommend to use extended magnetometer calibration (compensates hard & soft iron errors)
@@ -237,9 +238,11 @@ boolean output_errors = false;  // true or false
 
 // Gyroscope
 // "gyro x,y,z (current/average) = .../OFFSET_X  .../OFFSET_Y  .../OFFSET_Z
-#define GYRO_AVERAGE_OFFSET_X ((float) 0.0)
-#define GYRO_AVERAGE_OFFSET_Y ((float) 0.0)
-#define GYRO_AVERAGE_OFFSET_Z ((float) 0.0)
+//gyro x,y,z (current/average) = -11.00/-7.34  18.00/15.79  -12.00/-14.01
+
+#define GYRO_AVERAGE_OFFSET_X ((float) -7.34)
+#define GYRO_AVERAGE_OFFSET_Y ((float) 15.79)
+#define GYRO_AVERAGE_OFFSET_Z ((float) -14.01)
 
 /*
 // Calibration example:

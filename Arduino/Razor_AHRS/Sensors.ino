@@ -252,15 +252,15 @@ void Gyro_Init(){
 void Read_Gyro(){
   byte xMSB = readRegister(L3G4200D_Address, 0x29);
   byte xLSB = readRegister(L3G4200D_Address, 0x28);
-  gyro[0] = ((xMSB << 8) | xLSB);
+  gyro[0] = -1 * ((xMSB << 8) | xLSB);
 
   byte yMSB = readRegister(L3G4200D_Address, 0x2B);
   byte yLSB = readRegister(L3G4200D_Address, 0x2A);
-  gyro[1] = ((yMSB << 8) | yLSB);
+  gyro[1] = -1 * ((yMSB << 8) | yLSB);
 
   byte zMSB = readRegister(L3G4200D_Address, 0x2D);
   byte zLSB = readRegister(L3G4200D_Address, 0x2C);
-  gyro[2] = ((zMSB << 8) | zLSB);
+  gyro[2] = -1 * ((zMSB << 8) | zLSB);
 }
 
 void writeRegister(int deviceAddress, byte address, byte val) {
