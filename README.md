@@ -2,7 +2,8 @@ Razor AHRS v1.4.2
 ---
 
 **9 Degree of Measurement Attitude and Heading Reference System** for Vetco *9-Axis Inertial Navigation Module for Arduino* (VUPN6602)
-
+The four chips on this module are the L3G4200D Gyroscope, the ADXL345 Accelerometer, the HMC5883L compass and the BMP085 barometer thermometer.
+http://www.vetco.net/catalog/product_info.php?products_id=13835
 
 Forked from https://github.com/ptrbrtz/razor-9dof-ahrs
 
