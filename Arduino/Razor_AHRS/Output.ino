@@ -92,6 +92,7 @@ void output_sensors_binary()
   Serial.write((byte*) accel, 12);
   Serial.write((byte*) magnetom, 12);
   Serial.write((byte*) gyro, 12);
+  delay(10);
 }
 
 void output_sensors()

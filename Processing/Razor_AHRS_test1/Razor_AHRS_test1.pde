@@ -164,7 +164,7 @@ void draw() {
    // Reset scene
   background(0);
   lights();
-
+  /*
   // Sync with Razor 
   if (!synched) {
     textAlign(CENTER);
@@ -177,9 +177,15 @@ void draw() {
       synched = readToken(serial, "#SYNCH00\r\n");  // Look for synch token
     return;
   }
-  
+  */
   // Read angles from serial port
-  while (serial.available() >= 12) {
+  while (serial.available() >= 36) {
+    readFloat(serial);
+    readFloat(serial);
+    readFloat(serial);
+    readFloat(serial);
+    readFloat(serial);
+    readFloat(serial);
     yaw = readFloat(serial);
     pitch = readFloat(serial);
     roll = readFloat(serial);

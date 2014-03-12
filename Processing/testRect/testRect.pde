@@ -1,41 +1,19 @@
-/******************************************************************************************
-* Test Sketch for Razor AHRS v1.4.2
-* 9 Degree of Measurement Attitude and Heading Reference System
-* for Sparkfun "9DOF Razor IMU" and "9DOF Sensor Stick"
-*
-* Released under GNU GPL (General Public License) v3.0
-* Copyright (C) 2013 Peter Bartz [http://ptrbrtz.net]
-* Copyright (C) 2011-2012 Quality & Usability Lab, Deutsche Telekom Laboratories, TU Berlin
-* Written by Peter Bartz (peter-bartz@gmx.de)
-*
-* Infos, updates, bug reports, contributions and feedback:
-*     https://github.com/ptrbrtz/razor-9dof-ahrs
-******************************************************************************************/
-
-/*
-  NOTE: There seems to be a bug with the serial library in Processing versions 1.5
-  and 1.5.1: "WARNING: RXTX Version mismatch ...".
-  Processing 2.0.x seems to work just fine. Later versions may too.
-  Alternatively, the older version 1.2.1 also works and is still available on the web.
-*/
-
 import processing.opengl.*;
 import processing.serial.*;
 
-// IF THE SKETCH CRASHES OR HANGS ON STARTUP, MAKE SURE YOU ARE USING THE RIGHT SERIAL PORT:
-// 1. Have a look at the Processing console output of this sketch.
-// 2. Look for the serial port list and find the port you need (it's the same as in Arduino).
-// 3. Set your port number here:
 final static int SERIAL_PORT_NUM = 5;
-// 4. Try again.
 
 
-final static int SERIAL_PORT_BAUD_RATE = 38400;
+final static int SERIAL_PORT_BAUD_RATE = 34800;
 
 float yaw = 0.0f;
 float pitch = 0.0f;
 float roll = 0.0f;
+
 float yawOffset = 0.0f;
+
+float X = 0;
+float Y = 0;
 
 PFont font;
 Serial serial;
@@ -147,9 +125,10 @@ void setupRazor() {
   
   // Set Razor output parameters
   serial.write("#ob");  // Turn on binary output
+  serial.write("#oscb");
   serial.write("#o1");  // Turn on continuous streaming output
   serial.write("#oe0"); // Disable error message output
-  
+  serial.write("#oscb");
   // Synch with Razor
   serial.clear();  // Clear input buffer up to here
   serial.write("#s00");  // Request synch token
@@ -164,7 +143,7 @@ void draw() {
    // Reset scene
   background(0);
   lights();
-
+  /*
   // Sync with Razor 
   if (!synched) {
     textAlign(CENTER);
@@ -177,12 +156,19 @@ void draw() {
       synched = readToken(serial, "#SYNCH00\r\n");  // Look for synch token
     return;
   }
+  */
   
   // Read angles from serial port
-  while (serial.available() >= 12) {
+  while (serial.available() >= 36) {
     yaw = readFloat(serial);
     pitch = readFloat(serial);
     roll = readFloat(serial);
+    readFloat(serial);
+    readFloat(serial);
+    readFloat(serial);
+    readFloat(serial);
+    readFloat(serial);
+    readFloat(serial);
   }
 
   // Draw board
@@ -206,6 +192,37 @@ void draw() {
   text("Pitch: " + ((int) pitch), 150, 0);
   text("Roll: " + ((int) roll), 300, 0);
   popMatrix();
+  
+  //
+  pushMatrix();
+  /*
+  //X = X + -10 * (yawT - yaw );// - yawI;
+  X = X + -5 * (pitchT - pitch);
+  //Y = Y + -10 * (pitchT - pitch - pitchI);// - pitchI ;
+  Y = Y + -5 * (rollT - roll);
+  if(X < 0)
+    X = 0;
+  if(X > 640)
+    X = 640;
+    
+  if(Y < 0)
+    Y = 0;
+  if(Y > 480)
+    Y = 480;
+    */
+   
+   
+   //yawT = yaw;
+   //pitchT = pitch;
+   //rollT = roll;
+  
+  X = map(pitch, -130, 100, 0, 640);
+  Y = map(yaw, 100, -100, 0, 480); 
+   
+  translate(X,Y);
+  rect(0,0,10,10);
+  println(X + ", " + Y);
+  popMatrix();
 }
 
 void keyPressed() {
@@ -221,6 +238,10 @@ void keyPressed() {
       break;
     case 'a':  // Align screen with Razor
       yawOffset = yaw;
+      
+      //yawI = yaw;
+      //pitchI = pitch;
+      //rollI = roll;
   }
 }
 
