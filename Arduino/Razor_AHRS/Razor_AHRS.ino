@@ -167,7 +167,7 @@
 // OUTPUT OPTIONS
 /*****************************************************************/
 // Set your serial port baud rate used to send out data here!
-#define OUTPUT__BAUD_RATE 38400
+#define OUTPUT__BAUD_RATE 57600
 
 // Sensor data output interval in milliseconds
 // This may not work, if faster than 20ms (=50Hz)
@@ -186,7 +186,7 @@
 
 // Select your startup output mode and format here!
 int output_mode = OUTPUT__MODE_SENSORS_CALIB;
-int output_format = OUTPUT__FORMAT_BINARY;
+int output_format = OUTPUT__FORMAT_TEXT;
 
 // Select if serial continuous streaming output is enabled per default on startup.
 #define OUTPUT__STARTUP_STREAM_ON true  // true or false

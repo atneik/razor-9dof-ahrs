@@ -30,7 +30,7 @@ final static int SERIAL_PORT_NUM = 5;
 // 4. Try again.
 
 
-final static int SERIAL_PORT_BAUD_RATE = 38400;
+final static int SERIAL_PORT_BAUD_RATE = 57600;
 
 float yaw = 0.0f;
 float pitch = 0.0f;
@@ -146,19 +146,20 @@ void setupRazor() {
   delay(3000);  // 3 seconds should be enough
   
   // Set Razor output parameters
-  serial.write("#ob");  // Turn on binary output
-  serial.write("#o1");  // Turn on continuous streaming output
-  serial.write("#oe0"); // Disable error message output
+  //serial.write("#ob");  // Turn on binary output
+  //serial.write("#o1");  // Turn on continuous streaming output
+  //serial.write("#oe0"); // Disable error message output
   
   // Synch with Razor
   serial.clear();  // Clear input buffer up to here
-  serial.write("#s00");  // Request synch token
+  //serial.write("#s00");  // Request synch token
 }
 
 float readFloat(Serial s) {
   // Convert from little endian (Razor) to big endian (Java) and interpret as float
   return Float.intBitsToFloat(s.read() + (s.read() << 8) + (s.read() << 16) + (s.read() << 24));
 }
+
 
 void draw() {
    // Reset scene
@@ -177,20 +178,49 @@ void draw() {
       synched = readToken(serial, "#SYNCH00\r\n");  // Look for synch token
     return;
   }
-  */
   // Read angles from serial port
-  while (serial.available() >= 36) {
-    readFloat(serial);
-    readFloat(serial);
-    readFloat(serial);
-    readFloat(serial);
-    readFloat(serial);
-    readFloat(serial);
-    yaw = readFloat(serial);
-    pitch = readFloat(serial);
-    roll = readFloat(serial);
+  if(serial.available() >= 13){
+    if(serial.read() == '#'){
+      yaw = readFloat(serial);
+      pitch = readFloat(serial);
+      roll = readFloat(serial);
+    }
   }
-
+  */
+  
+  while (serial.available() >= 13) {
+    char ch = char(serial.read());
+    println(ch);
+    if(ch == '#'){
+      yaw = readFloat(serial);
+      pitch = readFloat(serial);
+      roll = readFloat(serial);
+      println(yaw + ", " + pitch);
+    }
+    
+  }
+  
+  /*
+  if(serial.available() > 0){
+    if(serial.readChar() == '#'){
+    String line[] = splitTokens(serial.readString(), ",");
+    print(line);
+    if(line.length == 4){
+      yaw = float(line[1]);
+      pitch = float(line[2]);
+      roll = float(line[3]);
+      }
+      else if(line.length == 3){
+      yaw = float(line[0]);
+      pitch = float(line[1]);
+      roll = float(line[2]);
+      }
+    }
+    
+  }
+ */
+  
+    
   // Draw board
   pushMatrix();
   translate(width/2, height/2, -350);

@@ -71,11 +71,13 @@ void output_calibration(int calibration_sensor)
 
 void output_sensors_text(char raw_or_calibrated)
 {
-  Serial.print("#A-"); Serial.print(raw_or_calibrated); Serial.print('=');
+  //Serial.print("#A-"); Serial.print(raw_or_calibrated); Serial.print('=');
+  Serial.write('#');
+  Serial.write((byte*) accel, 12);
+  /*
   Serial.print(accel[0]); Serial.print(",");
   Serial.print(accel[1]); Serial.print(",");
   Serial.print(accel[2]); Serial.println();
-
   Serial.print("#M-"); Serial.print(raw_or_calibrated); Serial.print('=');
   Serial.print(magnetom[0]); Serial.print(",");
   Serial.print(magnetom[1]); Serial.print(",");
@@ -85,10 +87,12 @@ void output_sensors_text(char raw_or_calibrated)
   Serial.print(gyro[0]); Serial.print(",");
   Serial.print(gyro[1]); Serial.print(",");
   Serial.print(gyro[2]); Serial.println();
+  */
 }
 
 void output_sensors_binary()
 {
+  //Serial.write((byte*)'#', 1);
   Serial.write((byte*) accel, 12);
   Serial.write((byte*) magnetom, 12);
   Serial.write((byte*) gyro, 12);
