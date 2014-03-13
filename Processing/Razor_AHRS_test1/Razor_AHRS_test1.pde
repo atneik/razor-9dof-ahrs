@@ -21,6 +21,8 @@
 
 import processing.opengl.*;
 import processing.serial.*;
+import java.io.InputStreamReader;
+import java.io.IOException;
 
 // IF THE SKETCH CRASHES OR HANGS ON STARTUP, MAKE SURE YOU ARE USING THE RIGHT SERIAL PORT:
 // 1. Have a look at the Processing console output of this sketch.
@@ -36,6 +38,29 @@ float yaw = 0.0f;
 float pitch = 0.0f;
 float roll = 0.0f;
 float yawOffset = 0.0f;
+
+int Sensitivity = 10;  //increaseing will inc the sensitivity 
+
+Runtime r;
+boolean continuous = false;  //continous sending of keystokes or not?
+
+static final int WAVE_STYLE = 0;
+static final int TILT_STYLE = 1;
+int STYLE = TILT_STYLE;
+
+static final int RIGHT_HANDED = 0;
+static final int LEFT_HANDED = 1;
+int HAND_PREF = RIGHT_HANDED;
+
+String lastKeyCode = "";
+
+boolean waveValueXStateR = true;
+boolean waveValueXStateL = true;
+
+int waveValueX;
+int waveValueY;
+int preWaveValueY = 0;
+int preWaveValueX = 0;
 
 PFont font;
 Serial serial;
@@ -119,8 +144,8 @@ void setup() {
   size(640, 480, OPENGL);
   smooth();
   noStroke();
-  frameRate(50);
-  
+  frameRate(20);    /**    FRAME RATE LOW  */
+  r = Runtime.getRuntime(); // for system calls
   // Load font
   font = loadFont("Univers-66.vlw");
   textFont(font);
@@ -128,11 +153,15 @@ void setup() {
   // Setup serial port I/O
   println("AVAILABLE SERIAL PORTS:");
   println(Serial.list());
-  String portName = Serial.list()[SERIAL_PORT_NUM];
-  println();
-  println("HAVE A LOOK AT THE LIST ABOVE AND SET THE RIGHT SERIAL PORT NUMBER IN THE CODE!");
-  println("  -> Using port " + SERIAL_PORT_NUM + ": " + portName);
-  serial = new Serial(this, portName, SERIAL_PORT_BAUD_RATE);
+  try{
+    String portName = Serial.list()[SERIAL_PORT_NUM];
+    println();
+    println("HAVE A LOOK AT THE LIST ABOVE AND SET THE RIGHT SERIAL PORT NUMBER IN THE CODE!");
+    println("  -> Using port " + SERIAL_PORT_NUM + ": " + portName);
+    serial = new Serial(this, portName, SERIAL_PORT_BAUD_RATE);
+  }catch(Exception e){
+    println("Check if the port number is right, or Xbee is connected correctly.");
+  }
 }
 
 void setupRazor() {
@@ -190,12 +219,99 @@ void draw() {
   
   while (serial.available() >= 13) {
     char ch = char(serial.read());
-    println(ch);
+    //println(ch);
     if(ch == '#'){
       yaw = readFloat(serial);
       pitch = readFloat(serial);
       roll = readFloat(serial);
-      println(yaw + ", " + pitch);
+      //println(yaw + ", " + pitch);
+     
+      switch(HAND_PREF){
+        
+        case LEFT_HANDED:
+        {
+          switch(STYLE){
+            case TILT_STYLE:
+              if(pitch < -110 + Sensitivity){
+                println("Left");
+                sendKeyCode("123");
+              }else if(pitch > 110 - Sensitivity){
+                println("Right");
+                sendKeyCode("124");
+              }                                //taking all individually 
+              else if(yaw < -50 + Sensitivity){
+                println("Down");
+                sendKeyCode("125");
+              }else if(yaw > 60 - Sensitivity){
+                println("Up");
+                sendKeyCode("126");
+              }
+              else{
+                lastKeyCode = "";
+              }
+              break;
+            case WAVE_STYLE:
+               waveValueX = (int)map(pitch, -255, 255, -10, 10);
+               waveValueY = (int)map(yaw, -255, 255, -10, 10);
+               println(waveValueX);
+               if(waveValueX <= preWaveValueX && waveValueX > 2 && waveValueXStateL == true){
+                 println("Right"); 
+                 
+                 waveValueXStateL = false;
+                 waveValueXStateR = true;
+                 
+               }else if(waveValueX >= preWaveValueX && waveValueX < -2 && waveValueXStateR == true){
+                 println("Left");
+                 waveValueXStateR = false; 
+                 waveValueXStateL = true; 
+               }
+               preWaveValueX = waveValueX;
+               
+          }
+        }
+        case RIGHT_HANDED:
+        {
+        switch(STYLE){
+            case TILT_STYLE:
+              if(pitch < -110 + Sensitivity){
+                println("Right");
+                sendKeyCode("124");
+              }else if(pitch > 110 - Sensitivity){
+                println("Left");
+                sendKeyCode("123");
+              }                                //taking all individually 
+              else if(yaw < -50 + Sensitivity){
+                println("Top");
+                sendKeyCode("126");
+              }else if(yaw > 60 - Sensitivity){
+                println("Down");
+                sendKeyCode("125");
+              }
+              else{
+                lastKeyCode = "";
+              }
+              break;
+            case WAVE_STYLE:
+               waveValueX = (int)map(pitch, -255, 255, -10, 10);
+               waveValueY = (int)map(yaw, -255, 255, -10, 10);
+               println(waveValueX);
+               if(waveValueX <= preWaveValueX && waveValueX > 2 && waveValueXStateL == true){
+                 println("Right"); 
+                 
+                 waveValueXStateL = false;
+                 waveValueXStateR = true;
+                 
+               }else if(waveValueX >= preWaveValueX && waveValueX < -2 && waveValueXStateR == true){
+                 println("Left");
+                 waveValueXStateR = false; 
+                 waveValueXStateL = true; 
+               }
+               preWaveValueX = waveValueX;
+               
+          }
+        }
+      }
+      
     }
     
   }
@@ -257,6 +373,33 @@ void keyPressed() {
       break;
     case 'a':  // Align screen with Razor
       yawOffset = yaw;
+  }
+}
+
+void sendKeyCode(String code){
+  String event = "tell application \"System Events\" to key code " + code;
+  String[] keyPress = { "osascript", "-e", event};
+  if(lastKeyCode.equals(code) == false){
+    try{
+      Process p = r.exec(keyPress);
+      if(continuous == false)
+        lastKeyCode = code;
+      try{
+          p.waitFor();
+          /*
+          BufferedReader b = new BufferedReader(new InputStreamReader(p.getInputStream()));
+          String line = "";
+          while ((line = b.readLine()) != null) {
+          println(line);
+          } 
+          */  
+          p.destroy();       
+      }catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    }catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }
 
