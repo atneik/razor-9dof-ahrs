@@ -1,24 +1,3 @@
-/******************************************************************************************
-* Test Sketch for Razor AHRS v1.4.2
-* 9 Degree of Measurement Attitude and Heading Reference System
-* for Sparkfun "9DOF Razor IMU" and "9DOF Sensor Stick"
-*
-* Released under GNU GPL (General Public License) v3.0
-* Copyright (C) 2013 Peter Bartz [http://ptrbrtz.net]
-* Copyright (C) 2011-2012 Quality & Usability Lab, Deutsche Telekom Laboratories, TU Berlin
-* Written by Peter Bartz (peter-bartz@gmx.de)
-*
-* Infos, updates, bug reports, contributions and feedback:
-*     https://github.com/ptrbrtz/razor-9dof-ahrs
-******************************************************************************************/
-
-/*
-  NOTE: There seems to be a bug with the serial library in Processing versions 1.5
-  and 1.5.1: "WARNING: RXTX Version mismatch ...".
-  Processing 2.0.x seems to work just fine. Later versions may too.
-  Alternatively, the older version 1.2.1 also works and is still available on the web.
-*/
-
 import processing.opengl.*;
 import processing.serial.*;
 import java.io.InputStreamReader;
@@ -39,10 +18,10 @@ float pitch = 0.0f;
 float roll = 0.0f;
 float yawOffset = 0.0f;
 
-int Sensitivity = 10;  //increaseing will inc the sensitivity 
+int Sensitivity = -10;  //increaseing will inc the sensitivity 
 
 Runtime r;
-boolean continuous = false;  //continous sending of keystokes or not?
+boolean continuous = true;  //continous sending of keystokes or not?
 
 static final int WAVE_STYLE = 0;
 static final int TILT_STYLE = 1;
@@ -56,6 +35,9 @@ String lastKeyCode = "";
 
 boolean waveValueXStateR = true;
 boolean waveValueXStateL = true;
+
+long prevTime;
+long currentTime;
 
 int waveValueX;
 int waveValueY;
@@ -144,11 +126,13 @@ void setup() {
   size(640, 480, OPENGL);
   smooth();
   noStroke();
-  frameRate(20);    /**    FRAME RATE LOW  */
+  frameRate(50);    /**    FRAME RATE LOW  */
   r = Runtime.getRuntime(); // for system calls
   // Load font
   font = loadFont("Univers-66.vlw");
   textFont(font);
+  
+  prevTime = System.currentTimeMillis();
   
   // Setup serial port I/O
   println("AVAILABLE SERIAL PORTS:");
@@ -288,6 +272,7 @@ void draw() {
                 sendKeyCode("125");
               }
               else{
+                println("Nothing.");
                 lastKeyCode = "";
               }
               break;
@@ -379,7 +364,9 @@ void keyPressed() {
 void sendKeyCode(String code){
   String event = "tell application \"System Events\" to key code " + code;
   String[] keyPress = { "osascript", "-e", event};
-  if(lastKeyCode.equals(code) == false){
+  currentTime = System.currentTimeMillis();
+  if(lastKeyCode.equals(code) == false && (currentTime - prevTime) > 800 ){
+    prevTime = currentTime;
     try{
       Process p = r.exec(keyPress);
       if(continuous == false)
